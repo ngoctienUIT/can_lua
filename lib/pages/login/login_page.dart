@@ -1,7 +1,9 @@
 import 'package:can_lua/pages/home/home_page.dart';
+import 'package:can_lua/pages/main_page/main_page.dart';
 import 'package:can_lua/pages/signup/signup_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -19,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     if (FirebaseAuth.instance.currentUser != null) {
-      return const HomePage();
+      return const MainPage();
     } else {
       return Scaffold(
         body: Container(
@@ -146,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const HomePage()),
+                                  builder: (context) => const MainPage()),
                             );
                           }
                         }
@@ -171,15 +173,33 @@ class _LoginPageState extends State<LoginPage> {
                   Row(
                     children: [
                       Expanded(
-                        child: SignInButton('Facebook',
-                            'assets/images/facebook_logo.png', Colors.blue),
+                        child: SignInButton(
+                            'Facebook',
+                            'assets/images/facebook_logo.png',
+                            Colors.blue,
+                            () {}),
                       ),
                       const SizedBox(
                         width: 30,
                       ),
                       Expanded(
-                        child: SignInButton('Google',
-                            'assets/images/google_logo.png', Colors.red),
+                        child: SignInButton(
+                            'Google',
+                            'assets/images/google_logo.png',
+                            Colors.red, () async {
+                          // final GoogleSignInAccount? googleUser =
+                          //     await GoogleSignIn().signIn();
+
+                          // final GoogleSignInAuthentication? googleAuth =
+                          //     await googleUser?.authentication;
+
+                          // final credential = GoogleAuthProvider.credential(
+                          //   accessToken: googleAuth?.accessToken,
+                          //   idToken: googleAuth?.idToken,
+                          // );
+                          // await FirebaseAuth.instance
+                          //     .signInWithCredential(credential);
+                        }),
                       )
                     ],
                   ),
@@ -214,7 +234,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   // ignore: non_constant_identifier_names
-  Widget SignInButton(String text, String path, Color color) {
+  Widget SignInButton(String text, String path, Color color, Function onClick) {
     return SizedBox(
       height: 45,
       child: ElevatedButton(
@@ -226,7 +246,9 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ),
-        onPressed: () {},
+        onPressed: () {
+          onClick();
+        },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

@@ -1,3 +1,4 @@
+import 'package:can_lua/pages/main_page/main_page.dart';
 import 'package:can_lua/provider/main_provider.dart';
 import 'package:can_lua/pages/login/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
