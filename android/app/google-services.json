@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "370747034109",
+    "project_id": "canlua-52936",
+    "storage_bucket": "canlua-52936.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:370747034109:android:a008881800a7c548f2b194",
+        "android_client_info": {
+          "package_name": "com.example.can_lua"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "370747034109-ihl8p2vsrn36upmp262175kbn1j5c0vn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.can_lua",
+            "certificate_hash": "70dd73f0551eaf9237676467f332f605535d9a10"
+          }
+        },
+        {
+          "client_id": "370747034109-j1lqonf0o7ifcmamtigkhv9l7qmpu42h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYH_mcnX2LKIqyaJIdKrR-_jfIkDq5KpY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "370747034109-j1lqonf0o7ifcmamtigkhv9l7qmpu42h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
