@@ -1,4 +1,5 @@
 import 'package:can_lua/pages/home/home_page.dart';
+import 'package:can_lua/pages/signup/signup_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -190,10 +191,18 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       const Text('Bạn chưa có tài khoản?'),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const SignupPage()));
+                        },
                         child: const Text('Đăng ký'),
                       )
                     ],
+                  ),
+                  const SizedBox(
+                    height: 10,
                   )
                 ],
               ),

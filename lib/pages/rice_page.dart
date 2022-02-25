@@ -338,7 +338,7 @@ class _RicePageState extends State<RicePage> {
                       child: Text('không có gì ở đây'),
                     );
             }
-            return const Center(child: Text('Loading...'));
+            return const Center(child: CircularProgressIndicator());
           },
         ));
   }

@@ -1,5 +1,6 @@
 import 'package:can_lua/class/item.dart';
 import 'package:can_lua/class/person.dart';
+import 'package:can_lua/pages/login/login_page.dart';
 import 'package:can_lua/provider/main_provider.dart';
 import 'package:can_lua/pages/rice_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -16,6 +17,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   TextEditingController controller = TextEditingController();
+
   void onClick() {
     CollectionReference user = FirebaseFirestore.instance
         .collection(FirebaseAuth.instance.currentUser!.email.toString());
@@ -100,10 +102,10 @@ class _HomePageState extends State<HomePage> {
         .collection('item')
         .get()
         .then((value) {
-      value.docs.forEach((doc) {
+      for (var doc in value.docs) {
         Item item = Item.fromJson(doc);
         total += item.total();
-      });
+      }
     });
     return total;
   }
@@ -111,169 +113,184 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const Drawer(child: SafeArea(child: Text('ok'))),
+      drawer: Drawer(
+          child: SafeArea(
+              child: ElevatedButton(
+                  onPressed: () async {
+                    await FirebaseAuth.instance.signOut();
+                    Navigator.pop(context);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LoginPage()));
+                  },
+                  child: const Text('Đăng Xuất')))),
       body: StreamBuilder<QuerySnapshot>(
           stream: users,
           builder: (context, snapshot) {
-            final data = snapshot.requireData;
-            final docs = data.docs;
-            persons = [];
+            if (snapshot.hasData) {
+              final data = snapshot.requireData;
+              final docs = data.docs;
+              persons = [];
 
-            for (var doc in docs) {
-              persons.add(Person.fromJson(doc));
-            }
+              for (var doc in docs) {
+                persons.add(Person.fromJson(doc));
+              }
 
-            persons.sort((a, b) => a.dateTime.compareTo(b.dateTime));
+              persons.sort((a, b) => a.dateTime.compareTo(b.dateTime));
 
-            return ListView.builder(
-                itemCount: persons.length,
-                itemBuilder: (context, index) {
-                  Person person = persons[index];
-                  return Container(
-                    margin: const EdgeInsets.all(20),
-                    decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            topRight: Radius.circular(20),
-                            bottomLeft: Radius.circular(10),
-                            bottomRight: Radius.circular(10)),
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                              blurRadius: 7,
-                              color: Colors.black38,
-                              offset: Offset(0, 3))
-                        ]),
-                    child: Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 30),
-                          decoration: BoxDecoration(
-                              color: Colors.amber,
-                              borderRadius: BorderRadius.circular(20)),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              ElevatedButton(
-                                style: ButtonStyle(
-                                  shape: MaterialStateProperty.all<
-                                      RoundedRectangleBorder>(
-                                    const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(10),
-                                        bottomLeft: Radius.circular(10),
+              return ListView.builder(
+                  itemCount: persons.length,
+                  itemBuilder: (context, index) {
+                    Person person = persons[index];
+                    return Container(
+                      margin: const EdgeInsets.all(20),
+                      decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20),
+                              bottomLeft: Radius.circular(10),
+                              bottomRight: Radius.circular(10)),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                                blurRadius: 7,
+                                color: Colors.black38,
+                                offset: Offset(0, 3))
+                          ]),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 30),
+                            decoration: BoxDecoration(
+                                color: Colors.amber,
+                                borderRadius: BorderRadius.circular(20)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                ElevatedButton(
+                                  style: ButtonStyle(
+                                    shape: MaterialStateProperty.all<
+                                        RoundedRectangleBorder>(
+                                      const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(10),
+                                          bottomLeft: Radius.circular(10),
+                                        ),
                                       ),
                                     ),
                                   ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const RicePage()),
+                                    );
+                                    context.read<MainProvider>().name =
+                                        person.name;
+                                    context.read<MainProvider>().id =
+                                        docs[index].id;
+                                  },
+                                  child: const Text('Mở'),
                                 ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => const RicePage()),
-                                  );
-                                  context.read<MainProvider>().name =
-                                      person.name;
-                                  context.read<MainProvider>().id =
-                                      docs[index].id;
-                                },
-                                child: const Text('Mở'),
-                              ),
-                              Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.account_circle_outlined,
-                                        color: Colors.purple,
-                                        size: 25,
-                                      ),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        person.name,
-                                        style: const TextStyle(
-                                            color: Colors.red,
-                                            fontWeight: FontWeight.bold),
-                                      )
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.calendar_today_outlined,
-                                        color: Colors.purple,
-                                        size: 18,
-                                      ),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        '${person.dateTime.toDate().day}/${person.dateTime.toDate().month}/${person.dateTime.toDate().year}',
-                                        style: const TextStyle(
-                                            color: Colors.purple,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 13),
-                                      )
-                                    ],
-                                  )
-                                ],
-                              ),
-                              ElevatedButton(
-                                style: ButtonStyle(
-                                  shape: MaterialStateProperty.all<
-                                      RoundedRectangleBorder>(
-                                    const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(10),
-                                        bottomRight: Radius.circular(10),
+                                Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.account_circle_outlined,
+                                          color: Colors.purple,
+                                          size: 25,
+                                        ),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text(
+                                          person.name,
+                                          style: const TextStyle(
+                                              color: Colors.red,
+                                              fontWeight: FontWeight.bold),
+                                        )
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.calendar_today_outlined,
+                                          color: Colors.purple,
+                                          size: 18,
+                                        ),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text(
+                                          '${person.dateTime.toDate().day}/${person.dateTime.toDate().month}/${person.dateTime.toDate().year}',
+                                          style: const TextStyle(
+                                              color: Colors.purple,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 13),
+                                        )
+                                      ],
+                                    )
+                                  ],
+                                ),
+                                ElevatedButton(
+                                  style: ButtonStyle(
+                                    shape: MaterialStateProperty.all<
+                                        RoundedRectangleBorder>(
+                                      const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(10),
+                                          bottomRight: Radius.circular(10),
+                                        ),
                                       ),
                                     ),
+                                    backgroundColor: MaterialStateProperty
+                                        .resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                        return Colors.red;
+                                      },
+                                    ),
                                   ),
-                                  backgroundColor:
-                                      MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) {
-                                      return Colors.red;
-                                    },
-                                  ),
+                                  onPressed: () {
+                                    setState(() async {
+                                      final collection = FirebaseFirestore
+                                          .instance
+                                          .collection(FirebaseAuth
+                                              .instance.currentUser!.email
+                                              .toString());
+                                      await collection
+                                          .doc(docs[index].id)
+                                          .delete();
+                                    });
+                                  },
+                                  child: const Text('Xóa'),
                                 ),
-                                onPressed: () {
-                                  setState(() async {
-                                    final collection = FirebaseFirestore
-                                        .instance
-                                        .collection(FirebaseAuth
-                                            .instance.currentUser!.email
-                                            .toString());
-                                    await collection
-                                        .doc(docs[index].id)
-                                        .delete();
-                                  });
-                                },
-                                child: const Text('Xóa'),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                        FutureBuilder(
-                          future: totalWeight(docs[index].id),
-                          builder: (context, snapshot) {
-                            return rowLine('Khối lượng', '${snapshot.data}');
-                          },
-                        ),
-                        underLine(),
-                        rowLine('Thành tiền:', '${person.price}'),
-                        underLine(),
-                        rowLine('Tiền cọc', '${person.deposit}'),
-                        underLine(),
-                        rowLine('Đã trả:', '${person.paid}'),
-                        underLine(),
-                        rowLine('Nợ lại:', '${person.price - person.paid}')
-                      ],
-                    ),
-                  );
-                });
+                          FutureBuilder(
+                            future: totalWeight(docs[index].id),
+                            builder: (context, snapshot) {
+                              return rowLine('Khối lượng', '${snapshot.data}');
+                            },
+                          ),
+                          underLine(),
+                          rowLine('Thành tiền:', '${person.price}'),
+                          underLine(),
+                          rowLine('Tiền cọc', '${person.deposit}'),
+                          underLine(),
+                          rowLine('Đã trả:', '${person.paid}'),
+                          underLine(),
+                          rowLine('Nợ lại:', '${person.price - person.paid}')
+                        ],
+                      ),
+                    );
+                  });
+            }
+            return const Center(child: CircularProgressIndicator());
           }),
       appBar: AppBar(title: const Text('Cân lúa'), centerTitle: true, actions: [
         IconButton(
