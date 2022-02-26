@@ -1,8 +1,9 @@
-import 'package:can_lua/pages/home/home_page.dart';
 import 'package:can_lua/pages/main_page/main_page.dart';
 import 'package:can_lua/pages/signup/signup_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginPage extends StatefulWidget {
@@ -143,8 +144,6 @@ class _LoginPageState extends State<LoginPage> {
                             }
                           }
                           if (userCredential != null) {
-                            Navigator.pop(context);
-
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -174,31 +173,60 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       Expanded(
                         child: SignInButton(
-                            'Facebook',
-                            'assets/images/facebook_logo.png',
-                            Colors.blue,
-                            () {}),
+                            'Facebook', FontAwesomeIcons.facebook, Colors.blue,
+                            () async {
+                          try {
+                            final LoginResult loginResult =
+                                await FacebookAuth.instance.login();
+
+                            // Create a credential from the access token
+                            final OAuthCredential facebookAuthCredential =
+                                FacebookAuthProvider.credential(
+                                    loginResult.accessToken!.token);
+
+                            // Once signed in, return the UserCredential
+                            await FirebaseAuth.instance
+                                .signInWithCredential(facebookAuthCredential);
+
+                            if (FirebaseAuth.instance.currentUser != null) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const MainPage()),
+                              );
+                            }
+                          } catch (e) {
+                            print(e);
+                          }
+                        }),
                       ),
                       const SizedBox(
                         width: 30,
                       ),
                       Expanded(
                         child: SignInButton(
-                            'Google',
-                            'assets/images/google_logo.png',
-                            Colors.red, () async {
-                          // final GoogleSignInAccount? googleUser =
-                          //     await GoogleSignIn().signIn();
+                            'Google', FontAwesomeIcons.google, Colors.red,
+                            () async {
+                          final GoogleSignInAccount? googleUser =
+                              await GoogleSignIn().signIn();
 
-                          // final GoogleSignInAuthentication? googleAuth =
-                          //     await googleUser?.authentication;
+                          final GoogleSignInAuthentication? googleAuth =
+                              await googleUser?.authentication;
 
-                          // final credential = GoogleAuthProvider.credential(
-                          //   accessToken: googleAuth?.accessToken,
-                          //   idToken: googleAuth?.idToken,
-                          // );
-                          // await FirebaseAuth.instance
-                          //     .signInWithCredential(credential);
+                          final credential = GoogleAuthProvider.credential(
+                            accessToken: googleAuth?.accessToken,
+                            idToken: googleAuth?.idToken,
+                          );
+                          await FirebaseAuth.instance
+                              .signInWithCredential(credential);
+
+                          if (FirebaseAuth.instance.currentUser != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const MainPage()),
+                            );
+                          }
                         }),
                       )
                     ],
@@ -234,7 +262,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   // ignore: non_constant_identifier_names
-  Widget SignInButton(String text, String path, Color color, Function onClick) {
+  Widget SignInButton(
+      String text, IconData icon, Color color, Function onClick) {
     return SizedBox(
       height: 45,
       child: ElevatedButton(
@@ -252,11 +281,7 @@ class _LoginPageState extends State<LoginPage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              path,
-              height: 23,
-              color: Colors.white,
-            ),
+            Icon(icon),
             const SizedBox(
               width: 15,
             ),

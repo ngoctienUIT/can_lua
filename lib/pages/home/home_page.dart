@@ -5,6 +5,7 @@ import 'package:can_lua/pages/rice_page/rice_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -212,7 +213,7 @@ class _HomePageState extends State<HomePage> {
                                       Row(
                                         children: [
                                           const Icon(
-                                            Icons.calendar_today_outlined,
+                                            FontAwesomeIcons.solidCalendarAlt,
                                             color: Colors.purple,
                                             size: 18,
                                           ),
